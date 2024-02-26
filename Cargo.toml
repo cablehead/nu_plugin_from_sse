@@ -2,11 +2,11 @@
 description = "nu shell plugin to convert a HTTP server sent event stream to structured data"
 edition = "2021"
 license = "MIT"
-name = "nu_plugin_http_sse"
+name = "nu_plugin_from_sse"
 version = "0.0.1"
 
 [[bin]]
-name = "nu_plugin_http_sse"
+name = "nu_plugin_from_sse"
 
 [dependencies]
 nu-plugin = { path = "../nushell/crates/nu-plugin", version = "0.90.2" }
