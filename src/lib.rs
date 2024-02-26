@@ -1,4 +1,4 @@
-mod example;
+mod from_sse;
 mod nu;
 
-pub use example::Example;
+pub use from_sse::Handler;
