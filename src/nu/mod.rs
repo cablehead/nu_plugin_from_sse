@@ -13,7 +13,7 @@ impl StreamingPlugin for Handler {
             ])
             .category(Category::Experimental)
             .input_output_types(vec![(
-                Type::Nothing,
+                Type::ListStream,
                 Type::List(Box::new(Type::Record(vec![
                     ("id".to_string(), Type::String),
                     ("name".to_string(), Type::String),
@@ -36,7 +36,7 @@ impl StreamingPlugin for Handler {
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
         if name == "from sse" {
-            self.from_sse(call, input) // Ensure this method is implemented in Handler
+            self.from_sse(call, input)
         } else {
             Err(LabeledError {
                 label: "Plugin call with wrong name signature".into(),

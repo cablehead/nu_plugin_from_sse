@@ -7,27 +7,29 @@ impl Handler {
     pub fn from_sse(
         &self,
         _call: &EvaluatedCall,
-        _input: PipelineData,
+        input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
         let span = Span::unknown(); // Replace with actual Span if available
 
-        // Construct records for demonstration
-        let event1 = self.create_record(
+        // Pre-create the record outside of the closure to avoid capturing `self`
+        let record = match self.create_record(
             vec!["id", "name", "data"],
             vec!["1", "event_name_1", "event_data_1"],
             span,
-        )?;
-        let event2 = self.create_record(
-            vec!["id", "name", "data"],
-            vec!["2", "event_name_2", "event_data_2"],
-            span,
-        )?;
+        ) {
+            Ok(record) => record,
+            Err(_) => return Err(LabeledError { // Handle error appropriately
+                label: "Error creating record".into(),
+                msg: "Failed to create record from columns and values".into(),
+                span: Some(span),
+            }),
+        };
 
-        let events = vec![event1, event2];
+        // Use a clone of the pre-created record for each item in the input
+        let stream = input.into_iter().map(move |_value| record.clone());
 
-        // Use ListStream::from_stream
-        let stream = ListStream::from_stream(events.into_iter(), None);
-        Ok(PipelineData::ListStream(stream, None))
+        let list_stream = ListStream::from_stream(stream, None);
+        Ok(PipelineData::ListStream(list_stream, None))
     }
 
     fn create_record(
