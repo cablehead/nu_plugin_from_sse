@@ -9,24 +9,81 @@ impl Handler {
         _call: &EvaluatedCall,
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
-        let span = Span::unknown(); // Replace with actual Span if available
+        let span = Span::unknown();
 
-        // Pre-create the record outside of the closure to avoid capturing `self`
         let record = match self.create_record(
             vec!["id", "name", "data"],
             vec!["1", "event_name_1", "event_data_1"],
             span,
         ) {
             Ok(record) => record,
-            Err(_) => return Err(LabeledError { // Handle error appropriately
-                label: "Error creating record".into(),
-                msg: "Failed to create record from columns and values".into(),
-                span: Some(span),
-            }),
+            Err(_) => {
+                return Err(LabeledError {
+                    label: "Error creating record".into(),
+                    msg: "Failed to create record from columns and values".into(),
+                    span: Some(span),
+                });
+            }
         };
 
-        // Use a clone of the pre-created record for each item in the input
-        let stream = input.into_iter().map(move |_value| record.clone());
+        #[derive(Clone, Default, Debug)]
+        struct Event {
+            data: String,
+            name: Option<String>,
+            id: Option<String>,
+        }
+
+        impl Event {
+            fn new() -> Self {
+                Event::default()
+            }
+
+            fn reset(&mut self) {
+                *self = Event::new();
+            }
+
+            fn is_empty(&self) -> bool {
+                self.data.is_empty() && self.name.is_none() && self.id.is_none()
+            }
+
+            fn parse_line(&mut self, line: &str) -> Option<Self> {
+                if line.trim().is_empty() {
+                    if !self.is_empty() {
+                        let cloned_event = self.clone();
+                        self.reset();
+                        return Some(cloned_event);
+                    }
+                } else if let Some(value) = line.strip_prefix("data:") {
+                    self.data.push_str(value.trim());
+                    self.data.push('\n');
+                } else if let Some(value) = line.strip_prefix("event:") {
+                    self.name = Some(value.trim().to_string());
+                } else if let Some(value) = line.strip_prefix("id:") {
+                    self.id = Some(value.trim().to_string());
+                }
+                None
+            }
+        }
+
+        let mut event = Event::new();
+        let mut remaining = String::new();
+
+        let stream = input.into_iter().map(move |value| {
+            match value {
+                Value::String { val, .. } => {
+                    remaining.push_str(&val);
+                    while let Some(pos) = remaining.find('\n') {
+                        let mut line = remaining.split_off(pos + 1);
+                        std::mem::swap(&mut remaining, &mut line);
+                        if let Some(emit) = event.parse_line(&line) {
+                            eprintln!("WHA? {:?}", &emit);
+                        }
+                    }
+                }
+                _ => panic!("Value is not a String"),
+            }
+            record.clone()
+        });
 
         let list_stream = ListStream::from_stream(stream, None);
         Ok(PipelineData::ListStream(list_stream, None))
