@@ -57,10 +57,9 @@ fn command_from_sse(
     let stream = input.into_iter().flat_map(move |value| match value {
         Value::String { val, internal_span } => {
             let events = parser.push(&val);
-            events.into_iter().map(move |event| Value::Record {
-                val: event.to_record(internal_span),
-                internal_span,
-            })
+            events
+                .into_iter()
+                .map(move |event| Value::record(event.to_record(internal_span), internal_span))
         }
         _ => panic!("Value is not a String"),
     });
