@@ -23,27 +23,14 @@ impl Event {
     pub fn to_record(&self, internal_span: Span) -> nu_protocol::Record {
         record! {
             "id" => match &self.id {
-                Some(id) => Value::String {
-                    val: id.clone(),
-                    internal_span,
-                },
-                None => Value::Nothing {
-                    internal_span,
-                },
+                Some(id) => Value::string(id.clone(), internal_span),
+                None => Value::nothing(internal_span),
             },
             "name" => match &self.name {
-                Some(name) => Value::String {
-                    val: name.clone(),
-                    internal_span,
-                },
-                None => Value::Nothing {
-                    internal_span,
-                },
+                Some(name) => Value::string(name.clone(), internal_span),
+                None => Value::nothing(internal_span),
             },
-            "data" => Value::String {
-                val: self.data.clone(),
-                internal_span,
-            }
+            "data" => Value::string(self.data.clone(), internal_span),
         }
     }
 }
