@@ -19,11 +19,7 @@ impl StreamingPlugin for Plugin {
             .category(Category::Experimental)
             .input_output_types(vec![(
                 Type::ListStream,
-                Type::List(Box::new(Type::Record(vec![
-                    ("id".to_string(), Type::String),
-                    ("name".to_string(), Type::String),
-                    ("data".to_string(), Type::String),
-                ]))),
+                Type::ListStream,
             )])
             .plugin_examples(vec![PluginExample {
                 example: "http get example.com/events | from sse".to_string(),
@@ -61,14 +57,10 @@ fn command_from_sse(
     let stream = input.into_iter().flat_map(move |value| match value {
         Value::String { val, internal_span } => {
             let events = parser.push(&val);
-            events
-                .into_iter()
-                .map(move |event| Value::Record {
-                    val: event.to_record(internal_span),
-                    internal_span,
-                })
-                .collect::<Vec<_>>()
-                .into_iter()
+            events.into_iter().map(move |event| Value::Record {
+                val: event.to_record(internal_span),
+                internal_span,
+            })
         }
         _ => panic!("Value is not a String"),
     });
