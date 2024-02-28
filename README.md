@@ -41,7 +41,7 @@ data: {"id":"uni123","type":"Unicorn","lat":45.4235,"lon":-75.6979,"urgency":"hi
 Use [`bp`](https://github.com/printfn/bp) to pipe it:
 
 ```nushell
-bp | from sse | update data { |i| ($i.data | from json) }
+bp | from sse | update data { from json }
 ````
 
 ![output](./docs/out.png)
