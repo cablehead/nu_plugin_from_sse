@@ -1,8 +1,13 @@
-use crate::from_sse::Handler;
 use nu_plugin::{EvaluatedCall, LabeledError, StreamingPlugin};
-use nu_protocol::{Category, PipelineData, PluginExample, PluginSignature, Type, Value};
+use nu_protocol::{
+    Category, ListStream, PipelineData, PluginExample, PluginSignature, Type, Value,
+};
 
-impl StreamingPlugin for Handler {
+use crate::parser;
+
+pub struct Plugin;
+
+impl StreamingPlugin for Plugin {
     fn signature(&self) -> Vec<PluginSignature> {
         vec![PluginSignature::build("from sse")
             .usage("Converts HTTP SSE (Server-Sent Events) into structured events")
@@ -36,7 +41,7 @@ impl StreamingPlugin for Handler {
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
         if name == "from sse" {
-            self.from_sse(call, input)
+            command_from_sse(call, input)
         } else {
             Err(LabeledError {
                 label: "Plugin call with wrong name signature".into(),
@@ -45,4 +50,29 @@ impl StreamingPlugin for Handler {
             })
         }
     }
+}
+
+fn command_from_sse(
+    _call: &EvaluatedCall,
+    input: PipelineData,
+) -> Result<PipelineData, LabeledError> {
+    let mut parser = parser::Parser::new();
+
+    let stream = input.into_iter().flat_map(move |value| match value {
+        Value::String { val, internal_span } => {
+            let events = parser.push(&val);
+            events
+                .into_iter()
+                .map(move |event| Value::Record {
+                    val: event.to_record(internal_span.clone()),
+                    internal_span: internal_span.clone(),
+                })
+                .collect::<Vec<_>>()
+                .into_iter()
+        }
+        _ => panic!("Value is not a String"),
+    });
+
+    let list_stream = ListStream::from_stream(stream, None);
+    Ok(PipelineData::ListStream(list_stream, None))
 }

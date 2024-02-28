@@ -1,5 +1,4 @@
-mod from_sse;
-mod nu;
+mod plugin;
 mod parser;
 
-pub use from_sse::Handler;
+pub use plugin::Plugin;
