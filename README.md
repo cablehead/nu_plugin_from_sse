@@ -1,4 +1,4 @@
-# Streaming Plugin Example: `nu_plugin_from_sse`
+# [`nu`](https://www.nushell.sh) [streaming plugin](https://github.com/nushell/nushell/pull/11911): `nu_plugin_from_sse`
 
 This plugin was forked off: link to stream crate plugin example nushell
 
