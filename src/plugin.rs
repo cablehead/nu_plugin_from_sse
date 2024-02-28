@@ -1,6 +1,6 @@
 use nu_plugin::{EvaluatedCall, LabeledError, StreamingPlugin};
 use nu_protocol::{
-    Category, ListStream, PipelineData, PluginExample, PluginSignature, Type, Value,
+    Category, ListStream, PipelineData, PluginExample, PluginSignature, Span, Type, Value,
 };
 
 use crate::parser;
@@ -9,8 +9,9 @@ pub struct Plugin;
 
 impl StreamingPlugin for Plugin {
     fn signature(&self) -> Vec<PluginSignature> {
+        let span = Span::unknown();
         vec![PluginSignature::build("from sse")
-            .usage("Converts HTTP SSE (Server-Sent Events) into structured events")
+            .usage("Converts an HTTP SSE (Server-Sent Events) stream into structured records")
             .search_terms(vec![
                 "sse".to_string(),
                 "stream".to_string(),
@@ -22,10 +23,16 @@ impl StreamingPlugin for Plugin {
                 (Type::String, Type::ListStream),
             ])
             .plugin_examples(vec![PluginExample {
-                example: "http get example.com/events | from sse".to_string(),
-                description: "Converts SSE from an HTTP GET request into structured events"
-                    .to_string(),
-                result: None, // You might want to include a hypothetical output example here
+                example: "http get http://example.com/events | from sse".to_string(),
+                description:
+                    "Converts an HTTP SSE (Server-Sent Events) stream into structured records"
+                        .to_string(),
+                result: Some(Value::record(
+                        parser::Event::new(
+                            Some("1"),
+                            Some("creatureAlert"),
+                            r#"{"id":"dra789","type":"Dragon","lat":45.4255,"lon":-75.6991,"urgency":"critical","desc":"Trapped by fallen trees after a storm."}"#,
+                       ).to_record(span), span)),
             }])]
     }
 

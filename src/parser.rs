@@ -2,18 +2,22 @@ use nu_protocol::{record, Span, Value};
 
 #[derive(Clone, Default, Debug)]
 pub struct Event {
-    id: Option<String>,
-    name: Option<String>,
-    data: String,
+    pub id: Option<String>,
+    pub name: Option<String>,
+    pub data: String,
 }
 
 impl Event {
-    fn new() -> Self {
-        Event::default()
+    pub fn new(id: Option<&str>, name: Option<&str>, data: &str) -> Self {
+        Event {
+            id: id.map(str::to_string),
+            name: name.map(str::to_string),
+            data: data.into(),
+        }
     }
 
     fn reset(&mut self) {
-        *self = Event::new();
+        *self = Event::default();
     }
 
     fn is_empty(&self) -> bool {
@@ -43,7 +47,7 @@ pub struct Parser {
 impl Parser {
     pub fn new() -> Self {
         Parser {
-            event: Event::new(),
+            event: Event::default(),
             remaining: String::new(),
         }
     }
