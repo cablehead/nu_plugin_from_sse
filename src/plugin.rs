@@ -9,7 +9,6 @@ pub struct Plugin;
 
 impl StreamingPlugin for Plugin {
     fn signature(&self) -> Vec<PluginSignature> {
-        let span = Span::unknown();
         vec![PluginSignature::build("from sse")
             .usage("Converts an HTTP SSE (Server-Sent Events) stream into structured records")
             .search_terms(vec![
@@ -27,12 +26,12 @@ impl StreamingPlugin for Plugin {
                 description:
                     "Converts an HTTP SSE (Server-Sent Events) stream into structured records"
                         .to_string(),
-                result: Some(Value::record(
+                result: Some(
                         parser::Event::new(
                             Some("1"),
                             Some("creatureAlert"),
                             r#"{"id":"dra789","type":"Dragon","lat":45.4255,"lon":-75.6991,"urgency":"critical","desc":"Trapped by fallen trees after a storm."}"#,
-                       ).to_record(span), span)),
+                       ).to_record_value(Span::unknown())),
             }])]
     }
 
@@ -66,7 +65,7 @@ fn command_from_sse(
             let events = parser.push(&val);
             events
                 .into_iter()
-                .map(move |event| Value::record(event.to_record(internal_span), internal_span))
+                .map(move |event| event.to_record_value(internal_span))
         }
         _ => panic!("Value is not a String"),
     });
