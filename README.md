@@ -39,9 +39,7 @@ data: {"id":"uni123","type":"Unicorn","lat":45.4235,"lon":-75.6979,"urgency":"hi
 Use [`bp`](https://github.com/printfn/bp) to pipe it:
 
 ```nushell
-bp | from sse
+bp | from sse | update data { |i| ($i.data | from json) }
 ````
 
-| id| name | data |
-| --- | --- | --- |
-|1|creatureAlert|{"id":"uni123","type":"Unicorn","lat":45.4235,"lon":-75.6979,"urgency":"high","desc":"Injured near Crystal River."} |
+![output](./docs/out.png)
