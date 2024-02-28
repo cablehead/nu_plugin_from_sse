@@ -5,7 +5,8 @@ This plugin was forked from the
 
 I'm looking to get a feel for how [nu
 plugins](https://www.nushell.sh/contributor-book/plugins.html#plugins) work,
-and in particular, what's possible with @devyn's new [streaming plugin
+and in particular, what's possible with [@devyn](https://github.com/devyn)'s
+new [streaming plugin
 PR](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_stream_example)
 that just landed in [nushell](https://www.nushell.sh) main.
 
