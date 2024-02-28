@@ -17,10 +17,10 @@ impl StreamingPlugin for Plugin {
                 "http".to_string(),
             ])
             .category(Category::Experimental)
-            .input_output_types(vec![(
-                Type::ListStream,
-                Type::ListStream,
-            )])
+            .input_output_types(vec![
+                (Type::ListStream, Type::ListStream),
+                (Type::String, Type::ListStream),
+            ])
             .plugin_examples(vec![PluginExample {
                 example: "http get example.com/events | from sse".to_string(),
                 description: "Converts SSE from an HTTP GET request into structured events"
