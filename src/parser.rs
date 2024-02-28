@@ -20,17 +20,17 @@ impl Event {
         self.data.is_empty() && self.name.is_none() && self.id.is_none()
     }
 
-    pub fn to_record(&self, internal_span: Span) -> nu_protocol::Record {
+    pub fn to_record(&self, span: Span) -> nu_protocol::Record {
         record! {
             "id" => match &self.id {
-                Some(id) => Value::string(id.clone(), internal_span),
-                None => Value::nothing(internal_span),
+                Some(id) => Value::string(id.clone(), span),
+                None => Value::nothing(span),
             },
             "name" => match &self.name {
-                Some(name) => Value::string(name.clone(), internal_span),
-                None => Value::nothing(internal_span),
+                Some(name) => Value::string(name.clone(), span),
+                None => Value::nothing(span),
             },
-            "data" => Value::string(self.data.clone(), internal_span),
+            "data" => Value::string(self.data.clone(), span),
         }
     }
 }
