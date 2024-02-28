@@ -10,6 +10,8 @@ new [streaming plugin
 PR](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_stream_example)
 that just landed in [nushell](https://www.nushell.sh) main.
 
+Feedback is appreciated :green_heart:
+
 It provides one command:
 
 ## `from sse`
