@@ -20,12 +20,6 @@ data: {"id":"uni123","type":"Unicorn","lat":45.4235,"lon":-75.6979,"urgency":"hi
 > bp | from sse
 > ````
 
-| Syntax | Description |
-| --- | ----------- |
-| Header | Title |
-| Paragraph | Text |
-
 | id| name | data |
 | --- | --- | --- |
 |1|creatureAlert|{"id":"uni123","type":"Unicorn","lat":45.4235,"lon":-75.6979,"urgency":"high","desc":"Injured near Crystal River."} |
-
