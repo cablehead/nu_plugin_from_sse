@@ -64,8 +64,8 @@ fn command_from_sse(
             events
                 .into_iter()
                 .map(move |event| Value::Record {
-                    val: event.to_record(internal_span.clone()),
-                    internal_span: internal_span.clone(),
+                    val: event.to_record(internal_span),
+                    internal_span,
                 })
                 .collect::<Vec<_>>()
                 .into_iter()
