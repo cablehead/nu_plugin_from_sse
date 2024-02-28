@@ -18,7 +18,13 @@ impl Handler {
                 let events = parser.push(&val);
                 events
                     .into_iter()
-                    .map(move |event| event.to_record(internal_span.clone()))
+                    .map(move |event| {
+                        // Convert the Record to a Value::Record variant
+                        Value::Record {
+                            val: event.to_record(internal_span.clone()),
+                            internal_span: internal_span.clone(),
+                        }
+                    })
                     .collect::<Vec<_>>()
                     .into_iter()
             }
