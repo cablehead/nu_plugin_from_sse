@@ -45,3 +45,9 @@ bp | from sse | update data { from json }
 ````
 
 ![output](./docs/out.png)
+
+### live example
+
+```nushell
+http get https://ndyg.cross.stream/projects/enchanted-animal-rescue/rescue-feed | from sse | update data { from json }
+```
