@@ -1,9 +1,10 @@
 use nu_plugin::{EvaluatedCall, LabeledError, StreamingPlugin};
 use nu_protocol::{
-    Category, ListStream, PipelineData, PluginExample, PluginSignature, Span, Type, Value,
+    Category, ListStream, PipelineData, PluginExample, PluginSignature, ShellError, Span, Type,
+    Value,
 };
 
-use crate::parser;
+use crate::parser::{Event, Parser};
 
 pub struct Plugin;
 
@@ -27,7 +28,7 @@ impl StreamingPlugin for Plugin {
                     "Converts an HTTP SSE (Server-Sent Events) stream into structured records"
                         .to_string(),
                 result: Some(
-                        parser::Event::new(
+                        Event::new(
                             Some("1"),
                             Some("creatureAlert"),
                             r#"{"id":"dra789","type":"Dragon","lat":45.4255,"lon":-75.6991,"urgency":"critical","desc":"Trapped by fallen trees after a storm."}"#,
@@ -54,21 +55,42 @@ impl StreamingPlugin for Plugin {
     }
 }
 
+fn process_string(s: &str, span: Span, parser: &mut Parser) -> impl Iterator<Item = Value> {
+    let events = parser.push(s);
+    events
+        .into_iter()
+        .map(move |event| event.to_record_value(span))
+}
+
+fn process_error(span: Span) -> impl Iterator<Item = Value> {
+    std::iter::once(Value::error(
+        ShellError::TypeMismatch {
+            err_message: "Value is not a String".into(),
+            span,
+        },
+        span,
+    ))
+}
+
+use itertools::Either;
+
+fn process_value(value: Value, parser: &mut Parser) -> impl Iterator<Item = Value> {
+    let span = value.span();
+    match value {
+        Value::String { val, .. } => Either::Left(process_string(&val, span, parser)),
+        _ => Either::Right(process_error(span)),
+    }
+}
+
 fn command_from_sse(
     _call: &EvaluatedCall,
     input: PipelineData,
 ) -> Result<PipelineData, LabeledError> {
-    let mut parser = parser::Parser::new();
+    let mut parser = Parser::new();
 
-    let stream = input.into_iter().flat_map(move |value| match value {
-        Value::String { val, internal_span } => {
-            let events = parser.push(&val);
-            events
-                .into_iter()
-                .map(move |event| event.to_record_value(internal_span))
-        }
-        _ => panic!("Value is not a String"),
-    });
+    let stream = input
+        .into_iter()
+        .flat_map(move |value| process_value(value, &mut parser));
 
     let list_stream = ListStream::from_stream(stream, None);
     Ok(PipelineData::ListStream(list_stream, None))
