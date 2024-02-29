@@ -73,31 +73,31 @@ fn event_to_record_value(event: &Event, span: Span) -> nu_protocol::Value {
     )
 }
 
-fn process_string(s: &str, span: Span, parser: &mut Parser) -> impl Iterator<Item = Value> {
+fn process_string(s: &str, span: Span, parser: &mut Parser) -> Vec<Value> {
     let events = parser.push(s);
     events
         .into_iter()
         .map(move |event| event_to_record_value(&event, span))
+        .collect()
 }
 
-fn process_error(span: Span) -> impl Iterator<Item = Value> {
-    std::iter::once(Value::error(
+fn process_error(span: Span) -> Vec<Value> {
+    vec![Value::error(
         ShellError::TypeMismatch {
             err_message: "Value is not a String".into(),
             span,
         },
         span,
-    ))
+    )]
 }
-
-use itertools::Either;
 
 fn process_value(value: Value, parser: &mut Parser) -> impl Iterator<Item = Value> {
     let span = value.span();
     match value {
-        Value::String { val, .. } => Either::Left(process_string(&val, span, parser)),
-        _ => Either::Right(process_error(span)),
+        Value::String { val, .. } => process_string(&val, span, parser),
+        _ => process_error(span),
     }
+    .into_iter()
 }
 
 fn command_from_sse(
