@@ -1,7 +1,7 @@
 use nu_plugin::{EvaluatedCall, LabeledError, StreamingPlugin};
 use nu_protocol::{
-    Category, ListStream, PipelineData, PluginExample, PluginSignature, ShellError, Span, Type,
-    Value,
+    record, Category, ListStream, PipelineData, PluginExample, PluginSignature, ShellError, Span,
+    Type, Value,
 };
 
 use crate::parser::{Event, Parser};
@@ -28,11 +28,12 @@ impl StreamingPlugin for Plugin {
                     "Converts an HTTP SSE (Server-Sent Events) stream into structured records"
                         .to_string(),
                 result: Some(
-                        Event::new(
+                    event_to_record_value(
+                        &Event::new(
                             Some("1"),
                             Some("creatureAlert"),
-                            r#"{"id":"dra789","type":"Dragon","lat":45.4255,"lon":-75.6991,"urgency":"critical","desc":"Trapped by fallen trees after a storm."}"#,
-                       ).to_record_value(Span::unknown())),
+                            r#"{"id":"dra789","type":"Dragon","lat":45.4255,"lon":-75.6991,"urgency":"critical","desc":"Trapped by fallen trees after a storm."}"#,)
+                       ,Span::unknown())),
             }])]
     }
 
@@ -55,11 +56,28 @@ impl StreamingPlugin for Plugin {
     }
 }
 
+fn event_to_record_value(event: &Event, span: Span) -> nu_protocol::Value {
+    Value::record(
+        record! {
+            "id" => match &event.id {
+                Some(id) => Value::string(id.clone(), span),
+                None => Value::nothing(span),
+            },
+            "name" => match &event.name {
+                Some(name) => Value::string(name.clone(), span),
+                None => Value::nothing(span),
+            },
+            "data" => Value::string(event.data.clone(), span),
+        },
+        span,
+    )
+}
+
 fn process_string(s: &str, span: Span, parser: &mut Parser) -> impl Iterator<Item = Value> {
     let events = parser.push(s);
     events
         .into_iter()
-        .map(move |event| event.to_record_value(span))
+        .map(move |event| event_to_record_value(&event, span))
 }
 
 fn process_error(span: Span) -> impl Iterator<Item = Value> {
