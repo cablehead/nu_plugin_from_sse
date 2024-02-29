@@ -26,6 +26,17 @@ This command transforms HTTP SSE (Server-Sent Events) into structured records wi
 }
 ```
 
+### known issue: nu table buffering
+
+If your SSE endpoint dispatches initial events upon connection, then
+pauses—awaiting rare updates—you won't see any output until the first new
+update after connecting. This behavior is due to nu's [table buffering
+mechanism](https://github.com/nushell/nushell/blob/65e5abaa3e48126ff730c9a59e5f6f55777a85bd/crates/nu-command/src/viewers/table.rs#L846-L875),
+where a duration timeout is factored in only during active input processing.
+
+An easy workaround for this issue is to pipe to
+[`each`](https://www.nushell.sh/commands/docs/each.html).
+
 ### example
 
 Copy this text to your clipboard:
