@@ -1,18 +1,16 @@
-# [`nu`](https://www.nushell.sh) [streaming plugin](https://github.com/nushell/nushell/pull/11911): `nu_plugin_from_sse`
+# [`nu`](https://www.nushell.sh) [streaming plugin](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html#plugin-protocol-overhaul-toc): `nu_plugin_from_sse`
 
 This plugin was forked from the
 [nu_plugin_stream_example](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_stream_example).
 
-I'm looking to get a feel for how [nu
-plugins](https://www.nushell.sh/contributor-book/plugins.html#plugins) work,
-and in particular, what's possible with [@devyn](https://github.com/devyn)'s
-new [streaming plugin
-PR](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_stream_example)
-that just landed in [nushell](https://www.nushell.sh) main.
+With Nushell
+[0.91.0](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html) [@devyn](https://github.com/devyn) has added support
+for [plugins that operate on streams](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html#plugin-protocol-overhaul-toc)
 
-Feedback is appreciated :green_heart:
+This makes possible plugin's like `nu_plugin_from_sse` which parses a stream of HTTP server sent events.
 
-It provides one command:
+`nu_plugin_from_sse` provides one command:
+
 
 ## `from sse`
 
@@ -62,5 +60,5 @@ bp | from sse | update data { from json }
 ```nushell
 http get https://ndyg.cross.stream/projects/enchanted-animal-rescue/rescue-feed |
     from sse |
-    update data { from json}
+    update data { from json }
 ```
