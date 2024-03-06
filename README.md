@@ -9,10 +9,19 @@ for [plugins that operate on streams](https://www.nushell.sh/blog/2024-03-05-nus
 
 This makes possible plugin's like `nu_plugin_from_sse` which parses a stream of HTTP server sent events.
 
+## Install with Cargo
+
+From within nushell:
+
+    cargo install --locked nu_plugin_from_sse
+    register ~/.cargo/bin/nu_plugin_from_sse
+
+## Usage
+
 `nu_plugin_from_sse` provides one command:
 
 
-## `from sse`
+### `from sse`
 
 This command transforms HTTP SSE (Server-Sent Events) into structured records with the shape:
 
@@ -24,7 +33,7 @@ This command transforms HTTP SSE (Server-Sent Events) into structured records wi
 }
 ```
 
-### known issue: nu table buffering
+#### known issue: nu table buffering
 
 If your SSE endpoint dispatches initial events upon connection, then
 pauses—awaiting rare updates—you won't see any output until the first new
@@ -35,7 +44,7 @@ where a duration timeout is factored in only during active input processing.
 An easy workaround for this issue is to pipe to
 [`each`](https://www.nushell.sh/commands/docs/each.html).
 
-### example
+#### example
 
 Copy this text to your clipboard:
 
@@ -55,7 +64,7 @@ bp | from sse | update data { from json }
 
 ![output](./docs/out.png)
 
-### live example
+#### live example
 
 ```nushell
 http get https://ndyg.cross.stream/projects/enchanted-animal-rescue/rescue-feed |
