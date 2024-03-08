@@ -33,7 +33,7 @@ This command transforms HTTP SSE (Server-Sent Events) into structured records wi
 }
 ```
 
-#### known issue: nu table buffering
+#### known issue: nu table buffering [#12129](https://github.com/nushell/nushell/issues/12129)
 
 If your SSE endpoint dispatches initial events upon connection, then
 pauses—awaiting rare updates—you won't see any output until the first new
