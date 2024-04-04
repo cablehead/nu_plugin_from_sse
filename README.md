@@ -1,13 +1,7 @@
 # [`nu`](https://www.nushell.sh) [streaming plugin](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html#plugin-protocol-overhaul-toc): `nu_plugin_from_sse`
 
 This plugin was forked from the
-[nu_plugin_stream_example](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_stream_example).
-
-With Nushell
-[0.91.0](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html) [@devyn](https://github.com/devyn) has added support
-for [plugins that operate on streams](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html#plugin-protocol-overhaul-toc)
-
-This makes possible plugin's like `nu_plugin_from_sse` which parses a stream of HTTP server sent events.
+[nu_plugin_example](https://github.com/nushell/nushell/blob/main/crates/nu_plugin_example/src/commands/sum.rs).
 
 ## Install with Cargo
 

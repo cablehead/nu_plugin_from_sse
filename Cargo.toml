@@ -14,5 +14,5 @@ repository = "https://github.com/cablehead/nu_plugin_from_sse"
 name = "nu_plugin_from_sse"
 
 [dependencies]
-nu-plugin = "0.91"
-nu-protocol = { version = "0.91", features = ["plugin"] }
+nu-plugin = "0.92"
+nu-protocol = { version = "0.92", features = ["plugin"] }
