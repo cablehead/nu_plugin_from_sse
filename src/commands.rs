@@ -54,7 +54,13 @@ impl PluginCommand for SSE {
         call: &EvaluatedCall,
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
-        command_from_sse(call, input)
+        let span = call.head;
+        let mut parser = Parser::new();
+        let stream = input
+            .into_iter()
+            .flat_map(move |value| process_value(value, &mut parser));
+        let list_stream = ListStream::new(stream, span, None);
+        Ok(PipelineData::ListStream(list_stream, None))
     }
 }
 
@@ -100,18 +106,4 @@ fn process_value(value: Value, parser: &mut Parser) -> impl Iterator<Item = Valu
         _ => process_error(span),
     }
     .into_iter()
-}
-
-fn command_from_sse(
-    _call: &EvaluatedCall,
-    input: PipelineData,
-) -> Result<PipelineData, LabeledError> {
-    let mut parser = Parser::new();
-
-    let stream = input
-        .into_iter()
-        .flat_map(move |value| process_value(value, &mut parser));
-
-    let list_stream = ListStream::from_stream(stream, None);
-    Ok(PipelineData::ListStream(list_stream, None))
 }

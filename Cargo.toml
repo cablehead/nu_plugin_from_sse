@@ -13,6 +13,11 @@ repository = "https://github.com/cablehead/nu_plugin_from_sse"
 [[bin]]
 name = "nu_plugin_from_sse"
 
+# [dependencies]
+# nu-plugin = "0.93"
+# nu-protocol = { version = "0.93", features = ["plugin"] }
+
 [dependencies]
-nu-plugin = "0.92"
-nu-protocol = { version = "0.92", features = ["plugin"] }
+nu-plugin = { git = "https://github.com/nushell/nushell.git", branch = "main" }
+nu-protocol = { git = "https://github.com/nushell/nushell.git", branch = "main", features = ["plugin"] }
+
