@@ -1,8 +1,9 @@
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{
     record, Category, Example, LabeledError, ListStream, PipelineData, ShellError, Signature, Span,
-    Type, Value,
+    Type, Value, Signals,
 };
+use std::sync::{atomic::AtomicBool, Arc};
 
 use crate::parser::{Event, Parser};
 use crate::plugin;
@@ -15,7 +16,7 @@ impl PluginCommand for SSE {
         "from sse"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Converts an HTTP SSE (Server-Sent Events) stream into structured records"
     }
 
@@ -59,7 +60,7 @@ impl PluginCommand for SSE {
         let stream = input
             .into_iter()
             .flat_map(move |value| process_value(value, &mut parser));
-        let list_stream = ListStream::new(stream, span, None);
+        let list_stream = ListStream::new(stream, span, Signals::new(Arc::new(AtomicBool::new(false))));
         Ok(PipelineData::ListStream(list_stream, None))
     }
 }

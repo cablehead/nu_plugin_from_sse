@@ -8,7 +8,7 @@ This plugin was forked from the
 From within nushell:
 
     cargo install --locked nu_plugin_from_sse
-    plugin use ~/.cargo/bin/nu_plugin_from_sse
+    plugin add ~/.cargo/bin/nu_plugin_from_sse
     # and then restart nu or use plugin add to activate
 
 ## Usage
