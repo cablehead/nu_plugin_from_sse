@@ -1,6 +1,6 @@
 [package]
 name = "nu_plugin_from_sse"
-version = "0.99.0"
+version = "0.101.0"
 edition = "2021"
 
 description = "Nushell plugin to convert a HTTP server sent event stream to structured data"
@@ -14,5 +14,5 @@ repository = "https://github.com/cablehead/nu_plugin_from_sse"
 name = "nu_plugin_from_sse"
 
 [dependencies]
-nu-plugin = "0.99.1"
-nu-protocol = { version = "0.99.1", features = ["plugin"] }
+nu-plugin = "0.101.0"
+nu-protocol = { version = "0.101.0", features = ["plugin"] }

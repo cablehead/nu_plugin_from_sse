@@ -43,8 +43,8 @@ impl PluginCommand for SSE {
         Signature::build("from sse")
             .category(Category::Experimental)
             .input_output_types(vec![
-                (Type::ListStream, Type::ListStream),
-                (Type::String, Type::ListStream),
+                (Type::List(Box::new(Type::Any)), Type::List(Box::new(Type::Any))),
+                (Type::String, Type::List(Box::new(Type::Any))),
             ])
     }
 
