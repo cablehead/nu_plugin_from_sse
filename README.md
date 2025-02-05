@@ -1,3 +1,36 @@
+As of Nushell [0.102.0](https://www.nushell.sh/blog/2025-02-04-nushell_0_102_0.html#generate-with-input-toc) `nu`'s [`generate`](https://www.nushell.sh/commands/docs/generate.html) command now supports stateful aggregation and downstream of streaming input. This means a plugin for things like `from sse` is no longer required. You can achieve the same result with a custom command similar to:
+
+```nushell
+export def "from sse" [] {
+  lines | generate {|line pending = {data: []}|
+
+    match ($line | split row -n 2 ":" | each { str trim }) {
+      [$prefix $content] if $prefix == "id" => {
+        return {next: ($pending | upsert id $content)}
+      }
+
+      [$prefix $content] if $prefix == "event" => {
+        return {next: ($pending | upsert event $content)}
+      }
+
+      [$prefix $content] if $prefix == "data" => {
+        return {next: ($pending | update data { append $content })}
+      }
+
+      [$empty] if $empty == "" => {
+        if ($pending == {data: []}) {
+          return {next: $pending}
+        }
+        return {next: {data: []} out: ($pending | update data { str join "\n" })}
+      }
+
+      _ => { error make {msg: $"unexpected: ($line)"} }
+    }
+  }
+}
+```
+
+
 # [`nu`](https://www.nushell.sh) [streaming plugin](https://www.nushell.sh/blog/2024-03-05-nushell_0_91_0.html#plugin-protocol-overhaul-toc): `nu_plugin_from_sse`
 
 This plugin was forked from the
